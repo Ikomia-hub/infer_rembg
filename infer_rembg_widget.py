@@ -33,6 +33,18 @@ class InferRembgWidget(core.CWorkflowTaskWidget):
 
         # Alpha matting
         self.check_matting = pyqtutils.append_check(self.grid_layout, "Alpha matting", self.parameters.alpha_matting)
+        print(type(self.parameters.alpha_matting_fg_threshold))
+        self.spin_matting_fg = pyqtutils.append_spin(self.grid_layout,
+                                                     "Alpha matting foreground threshold",
+                                                     self.parameters.alpha_matting_fg_threshold,
+                                                     min=1, max=255)
+        self.spin_matting_bg = pyqtutils.append_spin(self.grid_layout,
+                                                     "Alpha matting background threshold",
+                                                     self.parameters.alpha_matting_bg_threshold,
+                                                     min=0, max=254)
+        self.spin_matting_erode_size = pyqtutils.append_spin(self.grid_layout,
+                                                             "Alpha matting erode size",
+                                                             self.parameters.alpha_matting_erode_size)
 
         # Mask post-process
         self.check_mask_post_proc = pyqtutils.append_check(self.grid_layout,
@@ -50,6 +62,9 @@ class InferRembgWidget(core.CWorkflowTaskWidget):
         # Get parameters from widget
         self.parameters.model_name = self.combo_model.currentText()
         self.parameters.alpha_matting = self.check_matting.isChecked()
+        self.parameters.alpha_matting_fg_threshold = self.spin_matting_fg.value()
+        self.parameters.alpha_matting_bg_threshold = self.spin_matting_bg.value()
+        self.parameters.alpha_matting_erode_size = self.spin_matting_erode_size.value()
         self.parameters.post_process_mask = self.check_mask_post_proc.isChecked()
 
         # Send signal to launch the algorithm main function

@@ -26,8 +26,8 @@ def run_rembg(session: BaseSession,
               src_image: np.ndarray,
               post_process_mask: bool = False,
               alpha_matting: bool = False,
-              alpha_matting_foreground_threshold: int = 240,
-              alpha_matting_background_threshold: int = 10,
+              alpha_matting_fg_threshold: int = 240,
+              alpha_matting_bg_threshold: int = 10,
               alpha_matting_erode_size: int = 10,
               *args: Optional[Any],
               **kwargs: Optional[Any]):
@@ -52,8 +52,8 @@ def run_rembg(session: BaseSession,
                 cutout = alpha_matting_cutout(
                     img,
                     mask,
-                    alpha_matting_foreground_threshold,
-                    alpha_matting_background_threshold,
+                    alpha_matting_fg_threshold,
+                    alpha_matting_bg_threshold,
                     alpha_matting_erode_size,
                 )
             except ValueError:

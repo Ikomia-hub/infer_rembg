@@ -16,6 +16,9 @@ class InferRembgParam(core.CWorkflowTaskParam):
         # Place default value initialization here
         self.model_name = "u2net"
         self.alpha_matting = False
+        self.alpha_matting_fg_threshold = 240
+        self.alpha_matting_bg_threshold = 10
+        self.alpha_matting_erode_size = 10
         self.post_process_mask = False
 
     def set_values(self, params):
@@ -23,6 +26,9 @@ class InferRembgParam(core.CWorkflowTaskParam):
         # Parameters values are stored as string and accessible like a python dict
         self.model_name = params["model_name"]
         self.alpha_matting = strtobool(params["alpha_matting"])
+        self.alpha_matting_fg_threshold = int(params["alpha_matting_fg_threshold"])
+        self.alpha_matting_bg_threshold = int(params["alpha_matting_bg_threshold"])
+        self.alpha_matting_erode_size = int(params["alpha_matting_erode_size"])
         self.post_process_mask = strtobool(params["post_process_mask"])
 
     def get_values(self):
@@ -32,6 +38,9 @@ class InferRembgParam(core.CWorkflowTaskParam):
             "model_name": self.model_name,
             "alpha_matting": str(self.alpha_matting),
             "post_process_mask": str(self.post_process_mask),
+            "alpha_matting_fg_threshold": str(self.alpha_matting_fg_threshold),
+            "alpha_matting_bg_threshold": str(self.alpha_matting_bg_threshold),
+            "alpha_matting_erode_size": str(self.alpha_matting_erode_size),
         }
         return params
 
@@ -99,12 +108,18 @@ class InferRembg(dataprocess.C2dImageTask):
                                          src_image=src_image,
                                          post_process_mask=param.post_process_mask,
                                          alpha_matting=param.alpha_matting,
+                                         alpha_matting_fg_threshold=param.alpha_matting_fg_threshold,
+                                         alpha_matting_bg_threshold=param.alpha_matting_bg_threshold,
+                                         alpha_matting_erode_size=param.alpha_matting_erode_size,
                                          sam_prompt=prompt)
         else:
             mask, output_img = run_rembg(session=self.session,
                                          src_image=src_image,
                                          post_process_mask=param.post_process_mask,
-                                         alpha_matting=param.alpha_matting)
+                                         alpha_matting=param.alpha_matting,
+                                         alpha_matting_fg_threshold=param.alpha_matting_fg_threshold,
+                                         alpha_matting_bg_threshold=param.alpha_matting_bg_threshold,
+                                         alpha_matting_erode_size=param.alpha_matting_erode_size)
 
         # Get output :
         task_output = self.get_output(0)
