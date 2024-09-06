@@ -19,10 +19,11 @@
     </a> 
 </p>
 
-[Put algorithm description here]
+This algorithm proposes inference on various models to remove image background.
+It is based on the [rembg](https://github.com/danielgatis/rembg) library (CPU version only).
 
-[Insert illustrative image here. Image must be accessible publicly, in algorithm Github repository for example.
-<img src="images/illustration.png"  alt="Illustrative image" width="30%" height="30%">]
+![Illustration image](https://raw.githubusercontent.com/Ikomia-hub/infer_rembg/main/images/illustration.jpg)
+
 
 ## :rocket: Use with Ikomia API
 
@@ -36,19 +37,21 @@ pip install ikomia
 
 #### 2. Create your workflow
 
-[Change the sample image URL to fit algorithm purpose]
-
 ```python
 from ikomia.dataprocess.workflow import Workflow
-
+from ikomia.utils.displayIO import display
 # Init your workflow
-wf = Workflow()
+wf = Workflow()    
 
-# Add algorithm
-algo = wf.add_task(name="infer_rembg", auto_connect=True)
+# Add the real_esrgan algorithm
+algo = wf.add_task(name = 'infer_rembg', auto_connect=True)
 
 # Run on your image  
-wf.run_on(url="example_image.png")
+wf.run_on(url="https://raw.githubusercontent.com/Ikomia-dev/notebooks/main/examples/img/img_portrait.jpg")
+
+# Inspect your results
+display(algo.get_input(0).get_image())
+display(algo.get_output(1).get_image())
 ```
 
 ## :sunny: Use with Ikomia Studio
@@ -60,9 +63,12 @@ Ikomia Studio offers a friendly UI with the same features as the API.
 
 ## :pencil: Set algorithm parameters
 
-[Explain each algorithm parameters]
-
-[Change the sample image URL to fit algorithm purpose]
+- model_name (str): name of the model. Default: **u2net**
+- post_process_mask (bool): enable/disable mask post processing
+- alpha_matting (bool): enable/disable alpha matting
+- alpha_matting_fg_threshold (int): foreground threshold. Default: **240**
+- alpha_matting_bg_threshold (int): background threshold. Default: **10**
+- alpha_matting_erode_size (int): kernel size for erosion. Default: **10**
 
 ```python
 from ikomia.dataprocess.workflow import Workflow
@@ -71,16 +77,23 @@ from ikomia.dataprocess.workflow import Workflow
 wf = Workflow()
 
 # Add algorithm
-algo = wf.add_task(name="infer_rembg", auto_connect=True)
+rembg = wf.add_task(name="infer_rembg", auto_connect=True)
 
-algo.set_parameters({
-    "param1": "value1",
-    "param2": "value2",
-    ...
+rembg.set_parameters({
+    "model_name": "isnet-general-use",
+    "post_process_mask": "False",
+    "alpha_matting": "True",
+    "alpha_matting_fg_threshold": "240",
+    "alpha_matting_bg_threshold": "10",
+    "alpha_matting_erode_size": "7",
 })
 
 # Run on your image  
-wf.run_on(url="example_image.png")
+wf.run_on(url="https://raw.githubusercontent.com/Ikomia-dev/notebooks/main/examples/img/img_portrait.jpg")
+
+# Inspect your results
+display(rembg.get_input(0).get_image())
+display(rembg.get_output(1).get_image())
 ```
 
 ## :mag: Explore algorithm outputs
@@ -97,7 +110,7 @@ wf = Workflow()
 algo = wf.add_task(name="infer_rembg", auto_connect=True)
 
 # Run on your image  
-wf.run_on(url="example_image.png")
+wf.run_on(url="https://raw.githubusercontent.com/Ikomia-dev/notebooks/main/examples/img/img_portrait.jpg")
 
 # Iterate over outputs
 for output in algo.get_outputs():
@@ -106,7 +119,3 @@ for output in algo.get_outputs():
     # Export it to JSON
     output.to_json()
 ```
-
-## :fast_forward: Advanced usage 
-
-[optional]

@@ -24,6 +24,9 @@ class InferRembgWidget(core.CWorkflowTaskWidget):
         # Create layout : QGridLayout by default
         self.grid_layout = QGridLayout()
 
+        # GPU computing
+        # self.check_gpu = pyqtutils.append_check(self.grid_layout, "GPU", self.parameters.gpu)
+
         # Model name
         self.combo_model = pyqtutils.append_combo(self.grid_layout, "Model name")
         for model_name in REMBG_MODELS:
@@ -33,7 +36,6 @@ class InferRembgWidget(core.CWorkflowTaskWidget):
 
         # Alpha matting
         self.check_matting = pyqtutils.append_check(self.grid_layout, "Alpha matting", self.parameters.alpha_matting)
-        print(type(self.parameters.alpha_matting_fg_threshold))
         self.spin_matting_fg = pyqtutils.append_spin(self.grid_layout,
                                                      "Alpha matting foreground threshold",
                                                      self.parameters.alpha_matting_fg_threshold,
@@ -60,6 +62,7 @@ class InferRembgWidget(core.CWorkflowTaskWidget):
     def on_apply(self):
         # Apply button clicked slot
         # Get parameters from widget
+        # self.parameters.gpu = self.check_gpu.isChecked()
         self.parameters.model_name = self.combo_model.currentText()
         self.parameters.alpha_matting = self.check_matting.isChecked()
         self.parameters.alpha_matting_fg_threshold = self.spin_matting_fg.value()

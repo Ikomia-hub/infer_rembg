@@ -14,6 +14,14 @@ class InferRembgParam(core.CWorkflowTaskParam):
     def __init__(self):
         core.CWorkflowTaskParam.__init__(self)
         # Place default value initialization here
+        # GPU is not ready for the moment for the following reasons:
+        # - Weird behavior in rembg when we set ORT providers -> available providers (even not functional) are
+        #   systematically added to the list and let ORT choose the one to use
+        # - Bug in dependency management in rembg: rembg[gpu] install onnxruntime and onnxruntime-gpu side by side
+        #   and CPU is then the only functional provider
+        # - Issue in onnxruntime with cudnn linking. This requires a system-wide cuda/cudnn installation which is not
+        #   possible for automatic deployment with Ikomia Scale. An issue is opened in onnx repo.
+        # self.gpu = False
         self.model_name = "u2net"
         self.alpha_matting = False
         self.alpha_matting_fg_threshold = 240
@@ -24,6 +32,7 @@ class InferRembgParam(core.CWorkflowTaskParam):
     def set_values(self, params):
         # Set parameters values from Ikomia Studio or API
         # Parameters values are stored as string and accessible like a python dict
+        # self.gpu = strtobool(params["gpu"])
         self.model_name = params["model_name"]
         self.alpha_matting = strtobool(params["alpha_matting"])
         self.alpha_matting_fg_threshold = int(params["alpha_matting_fg_threshold"])
@@ -35,6 +44,7 @@ class InferRembgParam(core.CWorkflowTaskParam):
         # Send parameters values to Ikomia Studio or API
         # Create the specific dict structure (string container)
         params = {
+            # "gpu": str(self.gpu),
             "model_name": self.model_name,
             "alpha_matting": str(self.alpha_matting),
             "post_process_mask": str(self.post_process_mask),
@@ -64,6 +74,7 @@ class InferRembg(dataprocess.C2dImageTask):
         current_param = self.get_param_object()
         self.model_name = current_param.model_name
         self.session = None
+        # self.gpu = current_param.gpu
 
     def get_progress_steps(self):
         # Function returning the number of progress steps for this algorithm
@@ -92,9 +103,13 @@ class InferRembg(dataprocess.C2dImageTask):
 
         # Get parameters :
         param = self.get_param_object()
+        # if self.session is None or self.model_name != param.model_name or self.gpu != param.gpu:
         if self.session is None or self.model_name != param.model_name:
+            # self.gpu = param.gpu
             self.model_name = param.model_name
-            self.session = new_session(self.model_name)
+            # providers = ["CUDAExecutionProvider"] if self.gpu else ["CPUExecutionProvider"]
+            providers = ["CPUExecutionProvider"]
+            self.session = new_session(self.model_name, providers=providers)
 
         img_input = self.get_input(0)
         src_image = img_input.get_image()
@@ -148,7 +163,7 @@ class InferRembgFactory(dataprocess.CTaskFactory):
         # relative path -> as displayed in Ikomia Studio algorithm tree
         self.info.path = "Plugins/Python/Background"
         self.info.version = "1.0.0"
-        # self.info.icon_path = "your path to a specific icon"
+        self.info.icon_path = "images/icon.png"
         self.info.authors = "Daniel Gatis"
         self.info.article = ""
         self.info.journal = ""
@@ -167,7 +182,7 @@ class InferRembgFactory(dataprocess.CTaskFactory):
         self.info.documentation_link = ""
 
         # Code source repository
-        self.info.repository = ""
+        self.info.repository = "https://github.com/Ikomia-hub/infer_rembg"
         self.info.original_repository = "https://github.com/danielgatis/rembg"
 
         # Keywords used for search
