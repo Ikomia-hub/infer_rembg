@@ -64,6 +64,7 @@ class InferRembg(dataprocess.C2dImageTask):
     def __init__(self, name, param):
         dataprocess.C2dImageTask.__init__(self, name)
         self.add_output(dataprocess.CImageIO())
+        self.add_output(dataprocess.CImageIO())
 
         # Create parameters object
         if param is None:
@@ -136,10 +137,11 @@ class InferRembg(dataprocess.C2dImageTask):
                                          alpha_matting_bg_threshold=param.alpha_matting_bg_threshold,
                                          alpha_matting_erode_size=param.alpha_matting_erode_size)
 
+        self.forward_input_image(0, 0)
         # Get output :
-        task_output = self.get_output(0)
-        task_output.set_image(mask)
         task_output = self.get_output(1)
+        task_output.set_image(mask)
+        task_output = self.get_output(2)
         task_output.set_image(output_img)
 
         # Step progress bar (Ikomia Studio):
@@ -162,7 +164,7 @@ class InferRembgFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Remove background with rembg library"
         # relative path -> as displayed in Ikomia Studio algorithm tree
         self.info.path = "Plugins/Python/Background"
-        self.info.version = "1.0.0"
+        self.info.version = "1.1.0"
         self.info.icon_path = "images/icon.png"
         self.info.authors = "Daniel Gatis"
         self.info.article = ""
