@@ -97,6 +97,18 @@ class InferRembg(dataprocess.C2dImageTask):
 
         return prompt
 
+    def _load_model(self):
+        param = self.get_param_object()
+        # self.gpu = param.gpu
+        self.model_name = param.model_name
+        # providers = ["CUDAExecutionProvider"] if self.gpu else ["CPUExecutionProvider"]
+        providers = ["CPUExecutionProvider"]
+        self.session = new_session(self.model_name, providers=providers)
+
+    def init_long_process(self):
+        self._load_model()
+        super().init_long_process()
+
     def run(self):
         # Main function of your algorithm
         # Call begin_task_run() for initialization
@@ -105,12 +117,8 @@ class InferRembg(dataprocess.C2dImageTask):
         # Get parameters :
         param = self.get_param_object()
         # if self.session is None or self.model_name != param.model_name or self.gpu != param.gpu:
-        if self.session is None or self.model_name != param.model_name:
-            # self.gpu = param.gpu
-            self.model_name = param.model_name
-            # providers = ["CUDAExecutionProvider"] if self.gpu else ["CPUExecutionProvider"]
-            providers = ["CPUExecutionProvider"]
-            self.session = new_session(self.model_name, providers=providers)
+        if self.model_name != param.model_name:
+            self._load_model()
 
         img_input = self.get_input(0)
         src_image = img_input.get_image()
@@ -164,7 +172,7 @@ class InferRembgFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Remove background with rembg library"
         # relative path -> as displayed in Ikomia Studio algorithm tree
         self.info.path = "Plugins/Python/Background"
-        self.info.version = "1.1.0"
+        self.info.version = "1.2.0"
         self.info.icon_path = "images/icon.png"
         self.info.authors = "Daniel Gatis"
         self.info.article = ""
@@ -173,7 +181,7 @@ class InferRembgFactory(dataprocess.CTaskFactory):
         self.info.license = "MIT"
 
         # Ikomia API compatibility
-        # self.info.min_ikomia_version = "0.11.1"
+        self.info.min_ikomia_version = "0.15.0"
         # self.info.max_ikomia_version = "0.11.1"
 
         # Python compatibility
@@ -198,6 +206,12 @@ class InferRembgFactory(dataprocess.CTaskFactory):
         # OBJECT_DETECTION, OBJECT_TRACKING, OCR, OPTICAL_FLOW, OTHER, PANOPTIC_SEGMENTATION,
         # SEMANTIC_SEGMENTATION or SUPER_RESOLUTION
         self.info.algo_tasks = "IMAGE_MATTING"
+
+        # Min hardware config
+        self.info.hardware_config.min_cpu = 4
+        self.info.hardware_config.min_ram = 16
+        self.info.hardware_config.gpu_required = False
+        self.info.hardware_config.min_vram = 6
 
     def create(self, param=None):
         # Create algorithm object
