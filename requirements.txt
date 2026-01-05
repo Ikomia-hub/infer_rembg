@@ -1,1 +1,1 @@
-rembg[gpu]==2.0.72
+rembg[cpu]==2.0.61
