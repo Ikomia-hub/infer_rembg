@@ -172,7 +172,7 @@ class InferRembgFactory(dataprocess.CTaskFactory):
         self.info.short_description = "Remove background with rembg library"
         # relative path -> as displayed in Ikomia Studio algorithm tree
         self.info.path = "Plugins/Python/Background"
-        self.info.version = "1.2.1"
+        self.info.version = "1.3.0"
         self.info.icon_path = "images/icon.png"
         self.info.authors = "Daniel Gatis"
         self.info.article = ""
@@ -181,7 +181,7 @@ class InferRembgFactory(dataprocess.CTaskFactory):
         self.info.license = "MIT"
 
         # Ikomia API compatibility
-        self.info.min_ikomia_version = "0.15.0"
+        self.info.min_ikomia_version = "0.16.0"
         # self.info.max_ikomia_version = "0.11.1"
 
         # Python compatibility

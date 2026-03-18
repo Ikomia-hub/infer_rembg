@@ -1,10 +1,11 @@
+# PyQt GUI framework
+from PyQt6.QtWidgets import *
+
 from ikomia import core, dataprocess
 from ikomia.utils import pyqtutils, qtconversion
+
 from infer_rembg.infer_rembg_process import InferRembgParam
 from infer_rembg.core import REMBG_MODELS
-
-# PyQt GUI framework
-from PyQt5.QtWidgets import *
 
 
 # --------------------
